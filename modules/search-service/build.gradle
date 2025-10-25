@@ -28,6 +28,7 @@ graalvmNative {
     binaries {
         main {
             imageName = 'search-service'
+            mainClass = 'com.simonjamesrowe.searchservice.SearchServiceApplication'
             buildArgs.add('--verbose')
             buildArgs.add('-march=compatibility')
         }
