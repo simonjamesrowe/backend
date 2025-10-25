@@ -42,6 +42,7 @@ graalvmNative {
     binaries {
         main {
             imageName = 'api-gateway'
+            mainClass = 'com.simonjamesrowe.apigateway.ApiGatewayApplication'
             buildArgs.add('--verbose')
             buildArgs.add('-march=compatibility')
         }
