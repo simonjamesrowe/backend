@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot'
     id 'java'
+    id 'org.springframework.boot.aot'
     id 'org.graalvm.buildtools.native' version '0.10.6'
 }
 
@@ -45,6 +46,7 @@ graalvmNative {
             mainClass = 'com.simonjamesrowe.apigateway.ApiGatewayApplication'
             buildArgs.add('--verbose')
             buildArgs.add('-march=compatibility')
+            buildArgs.add('--initialize-at-build-time=org.slf4j.LoggerFactory,org.slf4j.helpers.Reporter,ch.qos.logback.classic.Level,ch.qos.logback.classic.Logger,ch.qos.logback.core.util.Loader,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.StatusPrinter2,ch.qos.logback.core.status.StatusBase,ch.qos.logback.core.status.InfoStatus,org.apache.commons.logging.LogFactory')
         }
     }
 }
@@ -68,4 +70,8 @@ bootBuildImage {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.named('processTestAot').configure {
+    enabled = false
 }

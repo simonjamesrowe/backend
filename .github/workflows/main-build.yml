@@ -54,6 +54,9 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -Pversion=${{ steps.version.outputs.VERSION }} --no-daemon
 
+      - name: Validate AOT assets
+        run: ./gradlew :modules:api-gateway:processAot :modules:search-service:processAot -Pversion=${{ steps.version.outputs.VERSION }} --no-daemon
+
       - name: Publish component-test and model to GitHub Packages
         run: ./gradlew :modules:component-test:publish :modules:model:publish -Pversion=${{ steps.version.outputs.VERSION }} --no-daemon --info
         env:
