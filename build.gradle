@@ -93,6 +93,12 @@ subprojects {
             html.required = true
         }
     }
+
+    tasks.withType(Checkstyle).configureEach {
+        if (name.toLowerCase(java.util.Locale.ROOT).contains('aot')) {
+            enabled = false
+        }
+    }
 }
 
 // Root tasks are already defined by the java plugin
