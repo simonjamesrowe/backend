@@ -26,11 +26,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build --no-daemon
 
+      - name: Validate AOT assets
+        run: ./gradlew :modules:api-gateway:processAot :modules:search-service:processAot --no-daemon
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-resultsi
+          name: test-results
           path: |
             **/build/reports/tests/
             **/build/test-results/
