@@ -57,3 +57,7 @@ bootBuildImage {
 test {
     useJUnitPlatform()
 }
+
+tasks.named('processTestAot').configure {
+    enabled = false
+}
