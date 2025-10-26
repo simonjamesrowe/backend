@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @JsonTest
-@AutoConfigureWireMock
+@AutoConfigureWireMock(port = 0)
 @ActiveProfiles("cms")
 @Import({CmsRestApi.class, RestClientConfiguration.class})
 class CmsRestApiTest {
