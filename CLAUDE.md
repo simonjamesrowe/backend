@@ -9,8 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew build
 
 # Build specific module
-./gradlew :modules:api-gateway:build
-./gradlew :modules:search-service:build
+./gradlew :modules:backend:build
 ./gradlew :modules:model:build
 ./gradlew :modules:component-test:build
 
@@ -18,25 +17,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew test
 
 # Run tests for specific module
-./gradlew :modules:api-gateway:test
-./gradlew :modules:search-service:test
+./gradlew :modules:backend:test
 
 # Run single test class
-./gradlew :modules:api-gateway:test --tests com.simonjamesrowe.apigateway.test.ApiGatewayApplicationTests
+./gradlew :modules:backend:test --tests com.simonjamesrowe.apigateway.test.ApiGatewayApplicationTests
 
 # Run single test method
-./gradlew :modules:api-gateway:test --tests "com.simonjamesrowe.apigateway.test.ApiGatewayApplicationTests.testMethod"
+./gradlew :modules:backend:test --tests "com.simonjamesrowe.apigateway.test.ApiGatewayApplicationTests.testMethod"
 
 # Clean build
 ./gradlew clean build
 
-# Build Docker images
-./gradlew :modules:api-gateway:bootBuildImage
-./gradlew :modules:search-service:bootBuildImage
+# Build Docker image
+./gradlew :modules:backend:bootBuildImage
 
-# Run services locally
-./gradlew :modules:api-gateway:bootRun
-./gradlew :modules:search-service:bootRun
+# Run service locally
+./gradlew :modules:backend:bootRun
 
 # Generate test reports
 ./gradlew jacocoTestReport
@@ -57,16 +53,20 @@ This is a multi-module Gradle project with a modular monolith architecture. All 
 
 ### Module Dependency Graph
 ```
-api-gateway ──┬──> model
-              └──> component-test (test only)
-
-search-service ──┬──> model
-                 └──> component-test (test only)
+backend ──┬──> model
+          └──> component-test (test only)
 ```
+
+### Unified Backend Module
+
+The `backend` module is a unified monolith that combines API gateway and search functionality:
+- **`apigateway/`** package - API gateway functionality (REST endpoints, CMS proxy, SendGrid integration, resume generation)
+- **`searchservice/`** package - Search functionality (Elasticsearch indexing, search endpoints, CMS sync)
+- Both packages follow clean architecture with `core/`, `dataproviders/`, `entrypoints/`, and `config/` layers
 
 ### Clean Architecture Layers
 
-Each service module follows clean architecture:
+The backend module follows clean architecture:
 - **`core/`** - Business logic (use cases, models, repository interfaces)
 - **`dataproviders/`** - External integrations (CMS, SendGrid, Elasticsearch)
 - **`entrypoints/`** - Entry points (REST controllers, Kafka consumers, scheduled tasks)
@@ -74,24 +74,24 @@ Each service module follows clean architecture:
 
 ### Event-Driven Communication
 
-Services communicate asynchronously via Kafka:
-- **Producer**: `api-gateway` publishes to `cms-events` topic via `WebhookController`
-- **Consumer**: `search-service` consumes from `cms-events` via `KafkaEventConsumer`
+Internal communication via Kafka (producer and consumer in same JVM):
+- **Producer**: `WebhookController` publishes to `cms-events` topic
+- **Consumer**: `KafkaEventConsumer` consumes from `cms-events`
 - **Event Types**: `BLOG_UPDATED`, `BLOG_DELETED`, `JOB_UPDATED`, `SKILLS_UPDATED`
 
 ### Data Flow Patterns
 
-1. **Synchronous REST**: Client → api-gateway → External Services (CMS, SendGrid)
-2. **Asynchronous Events**: CMS Webhook → api-gateway → Kafka → search-service → Elasticsearch
-3. **Scheduled Sync**: search-service periodically syncs all content from CMS to Elasticsearch
+1. **Synchronous REST**: Client → backend → External Services (CMS, SendGrid)
+2. **Asynchronous Events**: CMS Webhook → backend (WebhookController) → Kafka → backend (KafkaEventConsumer) → Elasticsearch
+3. **Scheduled Sync**: Backend periodically syncs all content from CMS to Elasticsearch
 
-### Module Conversion Notes
+### Migration History
 
-This project was migrated from separate Kotlin/Java repositories:
-- **api-gateway**: Mixed Java/Kotlin → Pure Java 21
-- **search-service**: Pure Kotlin → Java 21 (conversion in progress)
-- Test files converted from MockK to Mockito
-- Kotlin coroutines replaced with CompletableFuture/Reactor
+This project was migrated from separate services:
+- Originally: `api-gateway` and `search-service` as separate deployments
+- Now: Unified `backend` module combining both services
+- All code converted to Pure Java 21
+- Uses standard JVM Docker images (no GraalVM native compilation)
 
 ### Required Environment Variables
 
@@ -105,6 +105,9 @@ For building Docker images and publishing:
 
 - **Java 21** with Spring Boot 3.3.5
 - **Gradle** with Groovy DSL (not Kotlin DSL)
-- **Spring WebFlux** for reactive programming
+- **Spring Web** (servlet-based, not WebFlux)
+- **Spring Data Elasticsearch** for search functionality
+- **Spring Kafka** for event-driven communication
 - **Testcontainers** for integration testing
 - **Lombok** for reducing boilerplate
+- **Standard JVM deployment** (bootBuildImage with no native compilation)
