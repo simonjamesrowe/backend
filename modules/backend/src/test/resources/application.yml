@@ -5,6 +5,10 @@ spring:
     name: backend
   sendgrid:
     api-key: test-api-key
+  security:
+    user:
+      name: webhook
+      password: password
   threads:
     virtual:
       enabled: true
