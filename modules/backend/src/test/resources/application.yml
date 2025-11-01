@@ -3,6 +3,8 @@ cms:
 spring:
   application:
     name: backend
+  sendgrid:
+    api-key: test-api-key
   threads:
     virtual:
       enabled: true
@@ -44,9 +46,18 @@ elasticsearch:
     blog: blog_${namespace:local}
     site: site_${namespace:local}
 
+image:
+  compressFilesLargerThanKb: 400
+
+sendgrid:
+  email:
+    from: test@test.com
+    to: test@test.com
+
+resume:
+  cache-on-init: false
+
 opentracing:
   jaeger:
     http-sender:
       url: http://localhost:${wiremock.server.port}/api/traces
-
-
