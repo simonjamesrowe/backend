@@ -1,15 +1,15 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repo is a Gradle multi-module monolith. Shared build logic lives in `build.gradle`, while `settings.gradle` wires every module under `modules/`. `modules/api-gateway` exposes the REST facade, `modules/search-service` owns Elasticsearch flows, `modules/model` holds DTOs, and `modules/component-test` contains reusable Testcontainers fixtures. Configuration assets stay in `config/` (for example, Checkstyle rules) and generated build output under `build/`. Place new code in the proper module’s `src/main/java` and co-locate resources in `src/main/resources`.
+This repo is a Gradle multi-module monolith. Shared build logic lives in `build.gradle`, while `settings.gradle` wires every module under `modules/`. `modules/backend` is the unified backend service combining REST API and Elasticsearch search flows, `modules/model` holds DTOs, and `modules/component-test` contains reusable Testcontainers fixtures. Configuration assets stay in `config/` (for example, Checkstyle rules) and generated build output under `build/`. Place new code in the proper module's `src/main/java` and co-locate resources in `src/main/resources`.
 
 ## Build, Test, and Development Commands
 Use the Gradle wrapper exclusively:
 ```
-./gradlew clean build                           # compile all modules and run unit tests
-./gradlew :modules:api-gateway:bootRun          # launch the API gateway locally
-./gradlew :modules:search-service:bootBuildImage # create container image with Spring AOT
-./gradlew test jacocoTestReport                 # execute suites and publish coverage HTML
+./gradlew clean build                        # compile all modules and run unit tests
+./gradlew :modules:backend:bootRun           # launch the backend service locally
+./gradlew :modules:backend:bootBuildImage    # create container image
+./gradlew test jacocoTestReport              # execute suites and publish coverage HTML
 ```
 For focused builds, swap the module path (e.g., `:modules:model:build`).
 

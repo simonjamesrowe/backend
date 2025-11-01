@@ -15,7 +15,7 @@ spring:
     consumer:
       properties:
         spring.json.trusted.packages: com.simonjamesrowe.model
-      group-id: search-service
+      group-id: backend
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: com.simonjamesrowe.model.serialization.WebhookEventDeserializer
       max-poll-records: 20

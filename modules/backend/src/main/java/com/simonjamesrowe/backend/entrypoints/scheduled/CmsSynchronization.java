@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,12 +49,11 @@ public class CmsSynchronization implements ICmsSynchronization {
 
         try {
             LOG.info("Synchronising blog documents from cms");
-            cmsRestApi.getAllBlogsAsync().thenAccept(allBlogs -> {
-                var blogRequests = allBlogs.stream()
-                    .map(BlogMapper::toBlogIndexRequest)
-                    .collect(Collectors.toList());
-                indexBlogUseCase.indexBlogs(blogRequests);
-            }).join();
+            var allBlogs = cmsRestApi.getAllBlogs();
+            var blogRequests = allBlogs.stream()
+                .map(BlogMapper::toBlogIndexRequest)
+                .collect(Collectors.toList());
+            indexBlogUseCase.indexBlogs(blogRequests);
         } catch (Exception e) {
             LOG.error("Error synchronizing blog documents", e);
         }
@@ -70,42 +68,30 @@ public class CmsSynchronization implements ICmsSynchronization {
 
         try {
             LOG.info("Synchronising site documents from cms");
+            var allSiteDocuments = new ArrayList<IndexSiteRequest>();
 
-            CompletableFuture.allOf(
-                cmsRestApi.getAllBlogsAsync(),
-                cmsRestApi.getAllJobsAsync(),
-                cmsRestApi.getAllSkillsGroupsAsync()
-            ).thenApply(ignored -> {
-                var allSiteDocuments = new ArrayList<IndexSiteRequest>();
+            // Add blog site documents
+            var allBlogs = cmsRestApi.getAllBlogs();
+            allBlogs.forEach(blog ->
+                allSiteDocuments.add(BlogMapper.toSiteIndexRequest(blog))
+            );
 
-                // Add blog site documents
-                cmsRestApi.getAllBlogsAsync().thenAccept(allBlogs -> {
-                    allBlogs.forEach(blog ->
-                        allSiteDocuments.add(BlogMapper.toSiteIndexRequest(blog))
-                    );
-                }).join();
+            // Add job site documents
+            var allJobs = cmsRestApi.getAllJobs();
+            allJobs.forEach(job ->
+                allSiteDocuments.add(JobMapper.toIndexSiteRequest(job))
+            );
 
-                // Add job site documents
-                cmsRestApi.getAllJobsAsync().thenAccept(allJobs -> {
-                    allJobs.forEach(job ->
-                        allSiteDocuments.add(JobMapper.toIndexSiteRequest(job))
-                    );
-                }).join();
+            // Add skills site documents
+            var allSkillsGroups = cmsRestApi.getAllSkillsGroups();
+            allSkillsGroups.forEach(skillsGroup -> {
+                List<IndexSiteRequest> skillRequests =
+                        SkillsGroupMapper.toSiteIndexRequests(skillsGroup);
+                allSiteDocuments.addAll(skillRequests);
+            });
 
-                // Add skills site documents
-                cmsRestApi.getAllSkillsGroupsAsync().thenAccept(allSkillsGroups -> {
-                    allSkillsGroups.forEach(skillsGroup -> {
-                        List<IndexSiteRequest> skillRequests =
-                                SkillsGroupMapper.toSiteIndexRequests(skillsGroup);
-                        allSiteDocuments.addAll(skillRequests);
-                    });
-                }).join();
-
-                LOG.info("Indexing {} site documents", allSiteDocuments.size());
-                indexSiteUseCase.indexSites(allSiteDocuments);
-
-                return allSiteDocuments;
-            }).join();
+            LOG.info("Indexing {} site documents", allSiteDocuments.size());
+            indexSiteUseCase.indexSites(allSiteDocuments);
         } catch (Exception e) {
             LOG.error("Error synchronizing site documents", e);
         }

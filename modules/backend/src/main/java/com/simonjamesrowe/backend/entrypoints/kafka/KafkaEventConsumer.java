@@ -19,7 +19,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,10 +46,8 @@ public class KafkaEventConsumer implements IKafkaEventConsumer {
     public void consumeEvents(List<WebhookEventDTO> events) {
         try {
             LOG.info("Received events from kafka: {}", events);
-            CompletableFuture.allOf(
-                updateBlogSearchIndex(events),
-                updateSiteSearchIndex(events)
-            ).join();
+            updateBlogSearchIndex(events);
+            updateSiteSearchIndex(events);
         } catch (Exception exception) {
             if (exception.getCause() != null
                     && exception.getCause().getClass().getPackageName()
@@ -62,59 +59,54 @@ public class KafkaEventConsumer implements IKafkaEventConsumer {
         }
     }
 
-    private CompletableFuture<Void> updateSiteSearchIndex(List<WebhookEventDTO> events) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                boolean hasSkillEvents = events.stream().anyMatch(event -> Constants.TYPE_SKILL.equals(event.model()));
-                if (hasSkillEvents) {
-                    cmsRestApi.getAllSkillsGroupsAsync().thenAccept(skillsGroups -> {
-                        skillsGroups.forEach(skillsGroup -> {
-                            List<IndexSiteRequest> siteRequests = SkillsGroupMapper.toSiteIndexRequests(skillsGroup);
-                            indexSiteUseCase.indexSites(siteRequests);
-                        });
-                    }).join();
-                }
-
-                List<IndexSiteRequest> jobSiteRequests = events.stream()
-                    .filter(event -> Constants.TYPE_JOB.equals(event.model()))
-                    .map(event -> objectMapper.convertValue(event.entry(), JobResponseDTO.class))
-                    .map(JobMapper::toIndexSiteRequest)
-                    .collect(Collectors.toList());
-
-                if (!jobSiteRequests.isEmpty()) {
-                    indexSiteUseCase.indexSites(jobSiteRequests);
-                }
-
-                List<IndexSiteRequest> blogSiteRequests = events.stream()
-                    .filter(event -> Constants.TYPE_BLOG.equals(event.model()))
-                    .map(event -> objectMapper.convertValue(event.entry(), BlogResponseDTO.class))
-                    .map(BlogMapper::toSiteIndexRequest)
-                    .collect(Collectors.toList());
-
-                if (!blogSiteRequests.isEmpty()) {
-                    indexSiteUseCase.indexSites(blogSiteRequests);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to update site search index", e);
+    private void updateSiteSearchIndex(List<WebhookEventDTO> events) {
+        try {
+            boolean hasSkillEvents = events.stream().anyMatch(event -> Constants.TYPE_SKILL.equals(event.model()));
+            if (hasSkillEvents) {
+                var skillsGroups = cmsRestApi.getAllSkillsGroups();
+                skillsGroups.forEach(skillsGroup -> {
+                    List<IndexSiteRequest> siteRequests = SkillsGroupMapper.toSiteIndexRequests(skillsGroup);
+                    indexSiteUseCase.indexSites(siteRequests);
+                });
             }
-        });
+
+            List<IndexSiteRequest> jobSiteRequests = events.stream()
+                .filter(event -> Constants.TYPE_JOB.equals(event.model()))
+                .map(event -> objectMapper.convertValue(event.entry(), JobResponseDTO.class))
+                .map(JobMapper::toIndexSiteRequest)
+                .collect(Collectors.toList());
+
+            if (!jobSiteRequests.isEmpty()) {
+                indexSiteUseCase.indexSites(jobSiteRequests);
+            }
+
+            List<IndexSiteRequest> blogSiteRequests = events.stream()
+                .filter(event -> Constants.TYPE_BLOG.equals(event.model()))
+                .map(event -> objectMapper.convertValue(event.entry(), BlogResponseDTO.class))
+                .map(BlogMapper::toSiteIndexRequest)
+                .collect(Collectors.toList());
+
+            if (!blogSiteRequests.isEmpty()) {
+                indexSiteUseCase.indexSites(blogSiteRequests);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update site search index", e);
+        }
     }
 
-    private CompletableFuture<Void> updateBlogSearchIndex(List<WebhookEventDTO> events) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                List<IndexBlogRequest> blogRequests = events.stream()
-                    .filter(event -> Constants.TYPE_BLOG.equals(event.model()))
-                    .map(event -> objectMapper.convertValue(event.entry(), BlogResponseDTO.class))
-                    .map(BlogMapper::toBlogIndexRequest)
-                    .collect(Collectors.toList());
+    private void updateBlogSearchIndex(List<WebhookEventDTO> events) {
+        try {
+            List<IndexBlogRequest> blogRequests = events.stream()
+                .filter(event -> Constants.TYPE_BLOG.equals(event.model()))
+                .map(event -> objectMapper.convertValue(event.entry(), BlogResponseDTO.class))
+                .map(BlogMapper::toBlogIndexRequest)
+                .collect(Collectors.toList());
 
-                if (!blogRequests.isEmpty()) {
-                    indexBlogUseCase.indexBlogs(blogRequests);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to update blog search index", e);
+            if (!blogRequests.isEmpty()) {
+                indexBlogUseCase.indexBlogs(blogRequests);
             }
-        });
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update blog search index", e);
+        }
     }
 }

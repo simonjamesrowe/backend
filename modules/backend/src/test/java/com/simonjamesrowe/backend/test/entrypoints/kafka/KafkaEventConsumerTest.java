@@ -29,7 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -192,7 +191,7 @@ class KafkaEventConsumerTest {
             );
 
             when(cmsRestApi.getAllSkillsGroups())
-                .thenReturn(CompletableFuture.completedFuture(List.of(skillsGroup)));
+                .thenReturn(List.of(skillsGroup));
             skillsGroupMapperMock.when(() -> SkillsGroupMapper.toSiteIndexRequests(skillsGroup))
                 .thenReturn(List.of(siteIndexRequest1, siteIndexRequest2));
 

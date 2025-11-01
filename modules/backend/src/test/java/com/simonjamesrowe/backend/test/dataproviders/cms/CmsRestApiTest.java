@@ -19,7 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @JsonTest
@@ -42,9 +41,8 @@ class CmsRestApiTest {
     }
 
     @Test
-    void shouldReturnAllBlogsFromCms() throws Exception {
-        CompletableFuture<List<BlogResponseDTO>> future = cmsRestApi.getAllBlogs();
-        List<BlogResponseDTO> result = future.get();
+    void shouldReturnAllBlogsFromCms() {
+        List<BlogResponseDTO> result = cmsRestApi.getAllBlogs();
 
         Assertions.assertThat(result).hasSize(10);
         Assertions.assertThat(result.get(0)).hasFieldOrPropertyWithValue("id", "5f0215c69d8081001fd38fa1");
@@ -63,9 +61,8 @@ class CmsRestApiTest {
     }
 
     @Test
-    void shouldReturnAllJobsFromCms() throws Exception {
-        CompletableFuture<List<JobResponseDTO>> future = cmsRestApi.getAllJobs();
-        List<JobResponseDTO> result = future.get();
+    void shouldReturnAllJobsFromCms() {
+        List<JobResponseDTO> result = cmsRestApi.getAllJobs();
 
         Assertions.assertThat(result).hasSize(9);
         Assertions.assertThat(result.get(0))
@@ -85,9 +82,8 @@ class CmsRestApiTest {
     }
 
     @Test
-    void shouldReturnAllSkillsGroupsFromCms() throws Exception {
-        CompletableFuture<List<SkillsGroupResponseDTO>> future = cmsRestApi.getAllSkillsGroups();
-        List<SkillsGroupResponseDTO> result = future.get();
+    void shouldReturnAllSkillsGroupsFromCms() {
+        List<SkillsGroupResponseDTO> result = cmsRestApi.getAllSkillsGroups();
 
         Assertions.assertThat(result).hasSize(9);
         Assertions.assertThat(result.get(0)).hasFieldOrPropertyWithValue("name", "Java / Kotlin");

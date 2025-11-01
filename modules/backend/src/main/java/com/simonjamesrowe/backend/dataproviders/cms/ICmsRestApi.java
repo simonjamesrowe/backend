@@ -8,19 +8,14 @@ import com.simonjamesrowe.model.cms.dto.SkillsGroupResponseDTO;
 import com.simonjamesrowe.model.cms.dto.SocialMediaResponseDTO;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public interface ICmsRestApi {
 
-    // Sync methods (used by API Gateway)
+    List<BlogResponseDTO> getAllBlogs();
     List<JobResponseDTO> getAllJobs();
     List<SkillResponseDTO> getAllSkills();
+    List<SkillsGroupResponseDTO> getAllSkillsGroups();
+    List<SkillsGroupResponseDTO> getSkillsGroupBySkillId(String skillId);
     List<ProfileResponseDTO> getProfiles();
     List<SocialMediaResponseDTO> getAllSocialMedias();
-
-    // Async methods (used by Search Service)
-    CompletableFuture<List<BlogResponseDTO>> getAllBlogsAsync();
-    CompletableFuture<List<JobResponseDTO>> getAllJobsAsync();
-    CompletableFuture<List<SkillsGroupResponseDTO>> getAllSkillsGroupsAsync();
-    CompletableFuture<List<SkillsGroupResponseDTO>> getSkillsGroupBySkillIdAsync(String skillId);
 }

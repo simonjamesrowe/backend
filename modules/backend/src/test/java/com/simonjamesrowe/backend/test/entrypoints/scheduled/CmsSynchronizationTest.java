@@ -27,7 +27,6 @@ import org.springframework.core.env.Profiles;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -67,7 +66,7 @@ class CmsSynchronizationTest {
 
             when(environment.acceptsProfiles(any(Profiles.class))).thenReturn(true);
             when(cmsRestApi.getAllBlogs())
-                    .thenReturn(CompletableFuture.completedFuture(List.of(blog1, blog2)));
+                    .thenReturn(List.of(blog1, blog2));
 
             IndexBlogRequest indexBlogRequest1 = new IndexBlogRequest(
                 "1", "Blog 1", "Short desc 1", "Content 1", List.of(), List.of(),
@@ -108,7 +107,7 @@ class CmsSynchronizationTest {
                 TestUtils.image("blog2", 200)
             );
             when(cmsRestApi.getAllBlogs())
-                    .thenReturn(CompletableFuture.completedFuture(List.of(blog1, blog2)));
+                    .thenReturn(List.of(blog1, blog2));
 
             IndexSiteRequest siteIndexRequest1 = new IndexSiteRequest("blog_1", "/blogs/1",
                     "Blog 1", "Blogs", "thumb1.jpg", "Short desc 1", "Content 1");
@@ -129,7 +128,7 @@ class CmsSynchronizationTest {
                 LocalDate.now(), LocalDate.now(), true, false, "Location 2"
             );
             when(cmsRestApi.getAllJobs())
-                    .thenReturn(CompletableFuture.completedFuture(List.of(job1, job2)));
+                    .thenReturn(List.of(job1, job2));
 
             IndexSiteRequest siteIndexRequest3 = new IndexSiteRequest("job_1", "/jobs/1",
                     "Job 1", "Jobs", "company1.jpg", "Short desc 1", "Long desc 1");
@@ -159,8 +158,7 @@ class CmsSynchronizationTest {
                     List.of(skill3));
 
             when(cmsRestApi.getAllSkillsGroups())
-                    .thenReturn(CompletableFuture.completedFuture(
-                            List.of(skillsGroup1, skillsGroup2)));
+                    .thenReturn(List.of(skillsGroup1, skillsGroup2));
 
             IndexSiteRequest siteIndexRequest5 = new IndexSiteRequest("skill_1",
                     "/skills-groups/100#1", "Skill 1", "Skills", "skill1.jpg",

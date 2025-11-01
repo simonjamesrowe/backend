@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Component
 public class CmsRestApi implements ICmsRestApi {
@@ -26,7 +25,16 @@ public class CmsRestApi implements ICmsRestApi {
         this.cmsUrl = cmsProperties.url();
     }
 
-    // Synchronous methods (from API Gateway)
+    @NewSpan("http-getAllBlogs-cms")
+    @Override
+    public List<BlogResponseDTO> getAllBlogs() {
+        return restClient.get()
+                .uri(cmsUrl + "/blogs")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<BlogResponseDTO>>() { });
+    }
+
     @NewSpan("http-getAllJobs-cms")
     @Override
     public List<JobResponseDTO> getAllJobs() {
@@ -37,7 +45,7 @@ public class CmsRestApi implements ICmsRestApi {
                 .body(new ParameterizedTypeReference<List<JobResponseDTO>>() { });
     }
 
-    @NewSpan("http-getAllSkillsGroups-cms")
+    @NewSpan("http-getAllSkills-cms")
     @Override
     public List<SkillResponseDTO> getAllSkills() {
         return restClient.get()
@@ -45,6 +53,26 @@ public class CmsRestApi implements ICmsRestApi {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<SkillResponseDTO>>() { });
+    }
+
+    @NewSpan("http-getAllSkillsGroups-cms")
+    @Override
+    public List<SkillsGroupResponseDTO> getAllSkillsGroups() {
+        return restClient.get()
+                .uri(cmsUrl + "/skills-groups")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<SkillsGroupResponseDTO>>() { });
+    }
+
+    @NewSpan("http-getSkillsGroupBySkillId-cms")
+    @Override
+    public List<SkillsGroupResponseDTO> getSkillsGroupBySkillId(String skillId) {
+        return restClient.get()
+                .uri(cmsUrl + "/skills-groups?skill._id={id}", skillId)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<SkillsGroupResponseDTO>>() { });
     }
 
     @NewSpan("http-getProfiles-cms")
@@ -65,50 +93,5 @@ public class CmsRestApi implements ICmsRestApi {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<SocialMediaResponseDTO>>() { });
-    }
-
-    // Asynchronous methods (from Search Service)
-    @Override
-    public CompletableFuture<List<BlogResponseDTO>> getAllBlogsAsync() {
-        return CompletableFuture.supplyAsync(() ->
-            restClient.get()
-                .uri(cmsUrl + "/blogs")
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<BlogResponseDTO>>() { })
-        );
-    }
-
-    @Override
-    public CompletableFuture<List<JobResponseDTO>> getAllJobsAsync() {
-        return CompletableFuture.supplyAsync(() ->
-            restClient.get()
-                .uri(cmsUrl + "/jobs")
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<JobResponseDTO>>() { })
-        );
-    }
-
-    @Override
-    public CompletableFuture<List<SkillsGroupResponseDTO>> getAllSkillsGroupsAsync() {
-        return CompletableFuture.supplyAsync(() ->
-            restClient.get()
-                .uri(cmsUrl + "/skills-groups")
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<SkillsGroupResponseDTO>>() { })
-        );
-    }
-
-    @Override
-    public CompletableFuture<List<SkillsGroupResponseDTO>> getSkillsGroupBySkillIdAsync(String skillId) {
-        return CompletableFuture.supplyAsync(() ->
-            restClient.get()
-                .uri(cmsUrl + "/skills-groups?skill._id={id}", skillId)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<SkillsGroupResponseDTO>>() { })
-        );
     }
 }
