@@ -2,8 +2,7 @@ package com.simonjamesrowe.backend.test.entrypoints.kafka;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.simonjamesrowe.component.test.BaseComponentTest;
-import com.simonjamesrowe.component.test.ComponentTest;
+import com.simonjamesrowe.backend.test.BaseIntegrationTest;
 import com.simonjamesrowe.component.test.elasticsearch.WithElasticsearchContainer;
 import com.simonjamesrowe.component.test.kafka.WithKafkaContainer;
 import com.simonjamesrowe.model.cms.dto.BlogResponseDTO;
@@ -32,9 +31,8 @@ import java.util.Optional;
 
 @WithKafkaContainer
 @WithElasticsearchContainer
-@ComponentTest
 @ActiveProfiles("cms")
-class KafkaEventConsumerITest extends BaseComponentTest {
+class KafkaEventConsumerITest extends BaseIntegrationTest {
 
     @Autowired
     private KafkaTemplate<Object, Object> kafkaTemplate;

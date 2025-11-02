@@ -10,8 +10,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 
-public abstract class BaseComponentTest {
-
+public abstract class BaseIntegrationTest {
 
     @LocalServerPort
     protected Integer port;

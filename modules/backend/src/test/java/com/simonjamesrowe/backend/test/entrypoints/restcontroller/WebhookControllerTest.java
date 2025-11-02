@@ -3,8 +3,7 @@ package com.simonjamesrowe.backend.test.entrypoints.restcontroller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sendgrid.SendGrid;
 import com.simonjamesrowe.backend.core.usecase.IResumeUseCase;
-import com.simonjamesrowe.component.test.BaseComponentTest;
-import com.simonjamesrowe.component.test.ComponentTest;
+import com.simonjamesrowe.backend.test.BaseIntegrationTest;
 import com.simonjamesrowe.component.test.kafka.WithKafkaContainer;
 import com.simonjamesrowe.model.cms.dto.BlogResponseDTO;
 import com.simonjamesrowe.model.cms.dto.WebhookEventDTO;
@@ -28,10 +27,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.verify;
 
-@ComponentTest
 @WithKafkaContainer
 @ActiveProfiles("webhookControllerTest")
-class WebhookControllerTest extends BaseComponentTest {
+class WebhookControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private TestStreamListener testStreamListener;

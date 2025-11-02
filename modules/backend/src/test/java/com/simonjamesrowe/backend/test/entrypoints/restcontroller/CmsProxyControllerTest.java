@@ -1,7 +1,6 @@
 package com.simonjamesrowe.backend.test.entrypoints.restcontroller;
 
-import com.simonjamesrowe.component.test.BaseComponentTest;
-import com.simonjamesrowe.component.test.ComponentTest;
+import com.simonjamesrowe.backend.test.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -11,8 +10,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-@ComponentTest
-class CmsProxyControllerTest extends BaseComponentTest {
+class CmsProxyControllerTest extends BaseIntegrationTest {
 
     @Test
     void shouldProxyJobsRequest() {

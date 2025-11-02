@@ -1,10 +1,11 @@
 package com.simonjamesrowe.component.test.jwt;
 
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.simonjamesrowe.component.test.BaseComponentTest;
-import com.simonjamesrowe.component.test.ComponentTest;
+import com.simonjamesrowe.component.test.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -12,8 +13,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ComponentTest
-class JwtUtilsTest extends BaseComponentTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(stubs = "classpath:META-INF/mappings/*.json", port = 0)
+class JwtUtilsTest extends BaseIntegrationTest {
 
     @Value("http://localhost:${wiremock.server.port}/auth/realms/master/protocol/openid-connect/certs")
     private String jwksUrl;

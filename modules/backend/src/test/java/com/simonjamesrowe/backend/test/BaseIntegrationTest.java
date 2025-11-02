@@ -1,0 +1,37 @@
+package com.simonjamesrowe.backend.test;
+
+import com.github.tomakehurst.wiremock.WireMockServer;
+import io.restassured.RestAssured;
+import io.restassured.parsing.Parser;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.core.env.Environment;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(stubs = "classpath:META-INF/mappings/*.json", port = 0)
+public abstract class BaseIntegrationTest {
+
+    @LocalServerPort
+    protected Integer port;
+
+    @Autowired
+    protected WireMockServer wireMockServer;
+
+    @Autowired
+    protected Environment environment;
+
+    @Autowired(required = false)
+    protected Optional<KafkaListenerEndpointRegistry> optionalKafkaListenerEndpointRegistry;
+
+    @BeforeEach
+    public void setupRestAssured() {
+        wireMockServer.resetRequests();
+        RestAssured.baseURI = "http://localhost:" + port;
+        RestAssured.defaultParser = Parser.JSON;
+    }
+}
