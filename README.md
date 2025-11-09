@@ -25,7 +25,6 @@ com.simonjamesrowe.backend/
 ├── entrypoints/                   # Entry points (REST, Kafka, Scheduled tasks)
 └── mapper/                        # Data transformation mappers
 ```
-
 ### CMS Proxy Endpoints
 
 `CmsProxyController` forwards read-only endpoints such as `/jobs`, `/skills`, `/profiles`, and `/blogs` directly to the CMS while preserving query strings (for example `/blogs?published=true`). Requests for `/blogs/{id}` are proxied one-to-one, allowing the frontend to fetch unpublished drafts when required.
@@ -237,7 +236,6 @@ This project was refactored from separate microservices:
 - Now: Unified `backend` module combining both services
 - All code uses synchronous programming with virtual threads (no reactive/async patterns)
 - Uses standard JVM Docker images (no GraalVM native compilation)
-
 ## Publishing reusable modules
 
 `modules/model` and `modules/component-test` are distributed through GitHub Packages under `simonjamesrowe/backend`.
