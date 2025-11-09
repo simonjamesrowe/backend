@@ -24,7 +24,7 @@ public class BlogController {
         return searchBlogsUseCase.search(q);
     }
 
-    @GetMapping(value = "/blogs", params = "!q")
+    @GetMapping(value = "/blogs", params = {"!q", "!published"})
     public Collection<BlogSearchResult> getAll() {
         return searchBlogsUseCase.getAll();
     }

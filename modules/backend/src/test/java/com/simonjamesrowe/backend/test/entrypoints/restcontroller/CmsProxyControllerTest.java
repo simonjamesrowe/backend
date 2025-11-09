@@ -1,5 +1,6 @@
 package com.simonjamesrowe.backend.test.entrypoints.restcontroller;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.simonjamesrowe.backend.test.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 
@@ -7,6 +8,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -56,7 +58,8 @@ class CmsProxyControllerTest extends BaseIntegrationTest {
 
     @Test
     void shouldProxyBlogsRequestWithQueryString() {
-        stubFor(get(urlEqualTo("/blogs?published=true"))
+        stubFor(get(urlPathEqualTo("/blogs"))
+            .withQueryParam("published", WireMock.equalTo("true"))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")

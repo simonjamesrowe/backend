@@ -18,10 +18,17 @@ public class CmsProxyController {
     @Value("${cms.url}")
     private String cmsUrl;
 
-    @GetMapping({"/jobs", "/profiles", "/tags", "/blogs", "/skills-groups", "/social-medias", "/tour-steps", "/skills"})
+    @GetMapping({"/jobs", "/profiles", "/tags", "/skills-groups", "/social-medias", "/tour-steps", "/skills"})
     public ResponseEntity<String> proxyCmsRequest(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        String queryString = request.getQueryString();
+        return executeProxy(request.getRequestURI(), request.getQueryString());
+    }
+
+    @GetMapping(value = "/blogs", params = "published")
+    public ResponseEntity<String> proxyPublishedBlogs(HttpServletRequest request) {
+        return executeProxy(request.getRequestURI(), request.getQueryString());
+    }
+
+    private ResponseEntity<String> executeProxy(String path, String queryString) {
         String fullUrl = cmsUrl + path + (queryString != null ? "?" + queryString : "");
 
         return restClient.get()
@@ -32,12 +39,6 @@ public class CmsProxyController {
 
     @GetMapping("/blogs/{id}")
     public ResponseEntity<String> proxyCmsBlogRequest(@PathVariable String id, HttpServletRequest request) {
-        String queryString = request.getQueryString();
-        String fullUrl = cmsUrl + "/blogs/" + id + (queryString != null ? "?" + queryString : "");
-
-        return restClient.get()
-                .uri(fullUrl)
-                .retrieve()
-                .toEntity(String.class);
+        return executeProxy("/blogs/" + id, request.getQueryString());
     }
 }
