@@ -56,6 +56,14 @@ spring:
     service:
       name: ${spring.application.name}-${namespace:local}
 
+security:
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - http://simonrowe.localhost:8080
+      - https://simonrowe.dev
+      - https://www.simonrowe.dev
+
 cms:
   url: http://localhost:8000/
 

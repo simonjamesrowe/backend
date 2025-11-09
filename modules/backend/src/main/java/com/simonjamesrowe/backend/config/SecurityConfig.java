@@ -1,5 +1,7 @@
 package com.simonjamesrowe.backend.config;
 
+import java.util.List;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,7 +18,14 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties(SecurityCorsProperties.class)
 public class SecurityConfig {
+
+    private final SecurityCorsProperties securityCorsProperties;
+
+    public SecurityConfig(SecurityCorsProperties securityCorsProperties) {
+        this.securityCorsProperties = securityCorsProperties;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,11 +46,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
-        config.addAllowedMethod(HttpMethod.PUT);
-        config.addAllowedMethod(HttpMethod.PATCH);
-        config.addAllowedMethod(HttpMethod.DELETE);
-        source.registerCorsConfiguration("/contact-us", config);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(securityCorsProperties.allowedOrigins());
+        config.setAllowedMethods(
+            List.of(
+                HttpMethod.GET.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.PATCH.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name()
+            )
+        );
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
