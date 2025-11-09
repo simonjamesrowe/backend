@@ -1,6 +1,8 @@
 package com.simonjamesrowe.backend.test;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.simonjamesrowe.component.test.elasticsearch.WithElasticsearchContainer;
+import com.simonjamesrowe.component.test.kafka.WithKafkaContainer;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import java.util.Optional;
@@ -13,6 +15,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@WithKafkaContainer
+@WithElasticsearchContainer
 @AutoConfigureWireMock(stubs = "classpath:META-INF/mappings/*.json", port = 0)
 public abstract class BaseIntegrationTest {
 
@@ -24,9 +28,6 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected Environment environment;
-
-    @Autowired(required = false)
-    protected Optional<KafkaListenerEndpointRegistry> optionalKafkaListenerEndpointRegistry;
 
     @BeforeEach
     public void setupRestAssured() {
