@@ -74,8 +74,8 @@ publishing {
 
             pom {
                 name = 'Component Test'
-                description = 'Shared test infrastructure with TestContainers for backend-modulith'
-                url = 'https://github.com/simonjamesrowe/backend-modulith'
+                description = 'Shared test infrastructure with TestContainers for the backend service'
+                url = 'https://github.com/simonjamesrowe/backend'
 
                 licenses {
                     license {
@@ -92,9 +92,9 @@ publishing {
                 }
 
                 scm {
-                    connection = 'scm:git:git://github.com/simonjamesrowe/backend-modulith.git'
-                    developerConnection = 'scm:git:ssh://github.com/simonjamesrowe/backend-modulith.git'
-                    url = 'https://github.com/simonjamesrowe/backend-modulith'
+                    connection = 'scm:git:git://github.com/simonjamesrowe/backend.git'
+                    developerConnection = 'scm:git:ssh://github.com/simonjamesrowe/backend.git'
+                    url = 'https://github.com/simonjamesrowe/backend'
                 }
             }
 
@@ -111,7 +111,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/simonjamesrowe/backend-modulith")
+            url = uri("https://maven.pkg.github.com/simonjamesrowe/backend")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
@@ -124,4 +124,3 @@ publishing {
 tasks.withType(GenerateModuleMetadata) {
     suppressedValidationErrors.add('enforced-platform')
 }
-
