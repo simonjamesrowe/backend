@@ -5,14 +5,12 @@ import com.simonjamesrowe.component.test.elasticsearch.WithElasticsearchContaine
 import com.simonjamesrowe.component.test.kafka.WithKafkaContainer;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.core.env.Environment;
-import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @WithKafkaContainer
