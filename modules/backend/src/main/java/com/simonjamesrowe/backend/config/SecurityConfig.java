@@ -1,5 +1,7 @@
 package com.simonjamesrowe.backend.config;
 
+import java.util.List;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,7 +18,14 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties(SecurityCorsProperties.class)
 public class SecurityConfig {
+
+    private final SecurityCorsProperties securityCorsProperties;
+
+    public SecurityConfig(SecurityCorsProperties securityCorsProperties) {
+        this.securityCorsProperties = securityCorsProperties;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,16 +47,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(
-            java.util.List.of(
-                "http://localhost:3000",
-                "http://simonrowe.localhost:8080",
-                "https://simonrowe.dev",
-                "https://www.simonrowe.dev"
-            )
-        );
+        config.setAllowedOrigins(securityCorsProperties.allowedOrigins());
         config.setAllowedMethods(
-            java.util.List.of(
+            List.of(
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
                 HttpMethod.PUT.name(),
@@ -56,7 +58,7 @@ public class SecurityConfig {
                 HttpMethod.OPTIONS.name()
             )
         );
-        config.setAllowedHeaders(java.util.List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return source;
