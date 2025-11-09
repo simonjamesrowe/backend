@@ -21,12 +21,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'graalvm'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          distribution: 'temurin'
           cache: 'gradle'
 
       - name: Grant execute permission for gradlew
@@ -53,9 +52,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build -Pversion=${{ steps.version.outputs.VERSION }} --no-daemon
-
-      - name: Validate AOT assets
-        run: ./gradlew :modules:api-gateway:processAot :modules:search-service:processAot -Pversion=${{ steps.version.outputs.VERSION }} --no-daemon
 
       - name: Publish component-test and model to GitHub Packages
         run: ./gradlew :modules:component-test:publish :modules:model:publish -Pversion=${{ steps.version.outputs.VERSION }} --no-daemon --info
@@ -91,12 +87,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'graalvm'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          distribution: 'temurin'
           cache: 'gradle'
 
       - name: Grant execute permission for gradlew
@@ -109,21 +104,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build JAR and run AOT processing for api-gateway
-        run: ./gradlew :modules:api-gateway:clean :modules:api-gateway:bootJar -Pversion=${{ needs.build-test-and-version.outputs.version }} --no-daemon
+      - name: Build JAR for backend
+        run: ./gradlew :modules:backend:clean :modules:backend:bootJar -Pversion=${{ needs.build-test-and-version.outputs.version }} --no-daemon
 
-      - name: Build and publish api-gateway Docker image (${{ matrix.arch }})
-        run: ./gradlew :modules:api-gateway:bootBuildImage --imageName=ghcr.io/simonjamesrowe/api-gateway:${{ needs.build-test-and-version.outputs.version }}-${{ matrix.arch }} --publishImage -Pversion=${{ needs.build-test-and-version.outputs.version }} --no-daemon
-        timeout-minutes: 30
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build JAR and run AOT processing for search-service
-        run: ./gradlew :modules:search-service:clean :modules:search-service:bootJar -Pversion=${{ needs.build-test-and-version.outputs.version }} --no-daemon
-
-      - name: Build and publish search-service Docker image (${{ matrix.arch }})
-        run: ./gradlew :modules:search-service:bootBuildImage --imageName=ghcr.io/simonjamesrowe/search-service:${{ needs.build-test-and-version.outputs.version }}-${{ matrix.arch }} --publishImage -Pversion=${{ needs.build-test-and-version.outputs.version }} --no-daemon
+      - name: Build and publish backend Docker image (${{ matrix.arch }})
+        run: ./gradlew :modules:backend:bootBuildImage --imageName=ghcr.io/simonjamesrowe/backend:${{ needs.build-test-and-version.outputs.version }}-${{ matrix.arch }} --publishImage -Pversion=${{ needs.build-test-and-version.outputs.version }} --no-daemon
         timeout-minutes: 30
         env:
           GITHUB_ACTOR: ${{ github.actor }}
@@ -143,26 +128,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create multi-arch manifest for api-gateway (versioned)
+      - name: Create multi-arch manifest for backend (versioned)
         run: |
-          docker buildx imagetools create -t ghcr.io/simonjamesrowe/api-gateway:${{ needs.build-test-and-version.outputs.version }} \
-            ghcr.io/simonjamesrowe/api-gateway:${{ needs.build-test-and-version.outputs.version }}-amd64 \
-            ghcr.io/simonjamesrowe/api-gateway:${{ needs.build-test-and-version.outputs.version }}-arm64
+          docker buildx imagetools create -t ghcr.io/simonjamesrowe/backend:${{ needs.build-test-and-version.outputs.version }} \
+            ghcr.io/simonjamesrowe/backend:${{ needs.build-test-and-version.outputs.version }}-amd64 \
+            ghcr.io/simonjamesrowe/backend:${{ needs.build-test-and-version.outputs.version }}-arm64
 
-      - name: Create multi-arch manifest for api-gateway (latest)
+      - name: Create multi-arch manifest for backend (latest)
         run: |
-          docker buildx imagetools create -t ghcr.io/simonjamesrowe/api-gateway:latest \
-            ghcr.io/simonjamesrowe/api-gateway:${{ needs.build-test-and-version.outputs.version }}-amd64 \
-            ghcr.io/simonjamesrowe/api-gateway:${{ needs.build-test-and-version.outputs.version }}-arm64
-
-      - name: Create multi-arch manifest for search-service (versioned)
-        run: |
-          docker buildx imagetools create -t ghcr.io/simonjamesrowe/search-service:${{ needs.build-test-and-version.outputs.version }} \
-            ghcr.io/simonjamesrowe/search-service:${{ needs.build-test-and-version.outputs.version }}-amd64 \
-            ghcr.io/simonjamesrowe/search-service:${{ needs.build-test-and-version.outputs.version }}-arm64
-
-      - name: Create multi-arch manifest for search-service (latest)
-        run: |
-          docker buildx imagetools create -t ghcr.io/simonjamesrowe/search-service:latest \
-            ghcr.io/simonjamesrowe/search-service:${{ needs.build-test-and-version.outputs.version }}-amd64 \
-            ghcr.io/simonjamesrowe/search-service:${{ needs.build-test-and-version.outputs.version }}-arm64
+          docker buildx imagetools create -t ghcr.io/simonjamesrowe/backend:latest \
+            ghcr.io/simonjamesrowe/backend:${{ needs.build-test-and-version.outputs.version }}-amd64 \
+            ghcr.io/simonjamesrowe/backend:${{ needs.build-test-and-version.outputs.version }}-arm64

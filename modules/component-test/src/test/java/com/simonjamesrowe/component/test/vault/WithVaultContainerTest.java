@@ -1,9 +1,11 @@
 package com.simonjamesrowe.component.test.vault;
 
-import com.simonjamesrowe.component.test.ComponentTest;
+import com.simonjamesrowe.component.test.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.vault.core.VaultTemplate;
 
@@ -12,9 +14,10 @@ import java.util.Map;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @WithVaultContainer
-@ComponentTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(stubs = "classpath:META-INF/mappings/*.json", port = 0)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class WithVaultContainerTest {
+public class WithVaultContainerTest extends BaseIntegrationTest {
 
     @Value("${spring.cloud.vault.host}")
     private String vaultHost;

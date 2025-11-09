@@ -1,0 +1,78 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'java'
+}
+
+springBoot {
+    mainClass = 'com.simonjamesrowe.backend.BackendApplication'
+}
+
+dependencies {
+    implementation project(':modules:model')
+
+    // Spring Boot starters
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+    // OpenAPI
+    implementation 'de.qaware.tools.openapi-generator-for-spring:openapi-generator-for-spring-web:1.0.1'
+
+    // Tracing
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // SendGrid email
+    implementation 'com.sendgrid:sendgrid-java:4.10.3'
+
+    // PDF libraries
+    implementation 'org.apache.pdfbox:pdfbox:3.0.3'
+    implementation 'net.sf.barcode4j:barcode4j:2.1'
+    implementation 'org.apache.xmlgraphics:batik-bridge:1.18'
+    implementation 'com.github.librepdf:openpdf:2.0.3'
+    implementation 'com.itextpdf:kernel:8.0.3'
+    implementation 'com.itextpdf:layout:8.0.3'
+    implementation 'com.itextpdf:io:8.0.3'
+    implementation 'com.itextpdf:commons:8.0.3'
+
+    // Jakarta APIs
+    implementation 'jakarta.annotation:jakarta.annotation-api'
+    implementation 'jakarta.validation:jakarta.validation-api'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Test dependencies
+    testImplementation project(':modules:component-test')
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.jeasy:easy-random-core:5.0.0'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+bootBuildImage {
+    imageName = "ghcr.io/simonjamesrowe/backend:${version}"
+    environment = [
+        'BP_JVM_VERSION': '21'
+    ]
+    docker {
+        publishRegistry {
+            url = "https://ghcr.io"
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
+    createdDate = 'now'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,10 +1,11 @@
 package com.simonjamesrowe.component.test.kafka;
 
-import com.simonjamesrowe.component.test.BaseComponentTest;
-import com.simonjamesrowe.component.test.ComponentTest;
+import com.simonjamesrowe.component.test.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
@@ -19,10 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 @WithKafkaContainer
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(stubs = "classpath:META-INF/mappings/*.json", port = 0)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Import({TestKafkaListener2.class, KafkaAutoConfiguration.class})
-@ComponentTest
-public class WithKafkaContainerTest extends BaseComponentTest {
+public class WithKafkaContainerTest extends BaseIntegrationTest {
 
 
     @Autowired

@@ -1,9 +1,10 @@
 package com.simonjamesrowe.component.test.elasticsearch;
 
-import com.simonjamesrowe.component.test.BaseComponentTest;
-import com.simonjamesrowe.component.test.ComponentTest;
+import com.simonjamesrowe.component.test.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,11 +14,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @WithElasticsearchContainer
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(stubs = "classpath:META-INF/mappings/*.json", port = 0)
 @DirtiesContext
-@ComponentTest
 @Import(ElasticsearchTestConfiguration.class)
 @ActiveProfiles("elasticsearch")
-public class WithElasticsearchContainerTest extends BaseComponentTest {
+public class WithElasticsearchContainerTest extends BaseIntegrationTest {
 
     @Autowired
     private TestRepository testRepository;

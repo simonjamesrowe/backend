@@ -1,0 +1,82 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: backend
+
+  sendgrid:
+    api-key: xxxxxx
+
+  security:
+    user:
+      name: webhook
+      password: password
+
+  codec:
+    max-in-memory-size: 10MB
+
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
+
+  kafka:
+    consumer:
+      properties:
+        spring.json.trusted.packages: com.simonjamesrowe.model
+      group-id: backend
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: com.simonjamesrowe.model.serialization.WebhookEventDeserializer
+      max-poll-records: 20
+      enable-auto-commit: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: com.simonjamesrowe.model.serialization.WebhookEventSerializer
+
+  sleuth:
+    messaging:
+      kafka:
+        enabled: false
+      enabled: false
+    web:
+      webclient:
+        enabled: true
+
+  main:
+    allow-bean-definition-overriding: true
+    web-application-type: servlet
+
+  threads:
+    virtual:
+      enabled: true
+
+  zipkin:
+    sender:
+      type: web
+    service:
+      name: ${spring.application.name}-${namespace:local}
+
+cms:
+  url: http://localhost:8000/
+
+elasticsearch:
+  host: ${ELASTICSEARCH_HOST:localhost}
+  port: ${ELASTICSEARCH_PORT:9200}
+  username: ${ELASTICSEARCH_USERNAME:#{null}}
+  password: ${ELASTICSEARCH_PASSWORD:#{null}}
+  ssl:
+    enabled: ${ELASTICSEARCH_SSL_ENABLED:false}
+  index:
+    blog: blog_${namespace:local}
+    site: site_${namespace:local}
+
+image:
+  compressFilesLargerThanKb: 400
+
+sendgrid:
+  email:
+    from: simon@simonjamesrowe.com
+    to: simon.rowe@gmail.com
+
+resume:
+  cache-on-init: true
