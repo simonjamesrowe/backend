@@ -8,9 +8,9 @@ This is a modular monolith with a unified backend service that combines API gate
 
 ### Modules
 
-- **`modules/model`** - Common data models and DTOs
-- **`modules/component-test`** - Test utilities and shared test components
-- **`modules/backend`** - Unified backend service (REST API + Search)
+- **`modules/model`** - Common data models and DTOs (published to GitHub Packages)
+- **`modules/component-test`** - Test utilities, WireMock stubs, and Testcontainers fixtures (also published)
+- **`modules/backend`** - Unified backend service (REST API + Search + Kafka)
 
 ### Backend Module Structure
 
@@ -25,6 +25,10 @@ com.simonjamesrowe.backend/
 ├── entrypoints/                   # Entry points (REST, Kafka, Scheduled tasks)
 └── mapper/                        # Data transformation mappers
 ```
+
+### CMS Proxy Endpoints
+
+`CmsProxyController` forwards read-only endpoints such as `/jobs`, `/skills`, `/profiles`, and `/blogs` directly to the CMS while preserving query strings (for example `/blogs?published=true`). Requests for `/blogs/{id}` are proxied one-to-one, allowing the frontend to fetch unpublished drafts when required.
 
 ## Technology Stack
 
@@ -209,17 +213,16 @@ backend ──┬──> model
 
 ## Testing
 
-The project uses:
-- **JUnit 5** - Test framework
-- **Mockito** - Mocking framework
-- **Testcontainers** - Integration testing with Elasticsearch, Kafka
-- **AssertJ** - Assertions
-- **WireMock** - HTTP mocking
+- **JUnit 5** + **AssertJ** for unit and slice tests
+- **MockitoBean** overrides keep Spring contexts lean without spinning up full dependency graphs
+- **Testcontainers** for Kafka, Elasticsearch, Redis, Vault, Mongo, etc., exposed through the `component-test` module
+- **WireMock** for CMS/API stubs (e.g., `CmsProxyControllerTest`)
 
-Test utilities are provided in the `component-test` module for:
-- Elasticsearch testing
-- Kafka testing
-- Wiremock testing
+### Integration highlights
+
+- **Webhook/Kafka flow** – `WebhookControllerTest` now covers the complete loop: POST `/webhook`, assert the Kafka payload via a test listener, and ensure `KafkaEventConsumer` indexes Elasticsearch. This replaced the former standalone Kafka consumer test to avoid race conditions.
+- **CMS proxy coverage** – `CmsProxyControllerTest` uses Java text blocks for JSON fixtures, making the proxied responses readable and easy to maintain.
+- **Reusable fixtures** – `modules/component-test` publishes a reusable library (see below) so other projects or modules can share the same Testcontainers setup.
 
 ## Monitoring
 
@@ -234,3 +237,25 @@ This project was refactored from separate microservices:
 - Now: Unified `backend` module combining both services
 - All code uses synchronous programming with virtual threads (no reactive/async patterns)
 - Uses standard JVM Docker images (no GraalVM native compilation)
+
+## Publishing reusable modules
+
+`modules/model` and `modules/component-test` are distributed through GitHub Packages under `simonjamesrowe/backend`.
+
+```bash
+export GITHUB_ACTOR=<your-user>
+export GITHUB_TOKEN=<token-with-packages-permissions>
+
+./gradlew :modules:model:publish \
+          :modules:component-test:publish \
+          -Pversion=<semver>
+```
+
+For local verification use:
+
+```bash
+./gradlew :modules:model:publishToMavenLocal \
+          :modules:component-test:publishToMavenLocal
+```
+
+The generated POM metadata (project URLs and SCM links) also points at this repository, preventing the 404s that occurred when the old `backend-modulith` namespace was referenced during CI publishes.
