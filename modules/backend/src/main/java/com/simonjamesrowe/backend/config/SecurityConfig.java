@@ -37,11 +37,28 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
-        config.addAllowedMethod(HttpMethod.PUT);
-        config.addAllowedMethod(HttpMethod.PATCH);
-        config.addAllowedMethod(HttpMethod.DELETE);
-        source.registerCorsConfiguration("/contact-us", config);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(
+            java.util.List.of(
+                "http://localhost:3000",
+                "http://simonrowe.localhost:8080",
+                "https://simonrowe.dev",
+                "https://www.simonrowe.dev"
+            )
+        );
+        config.setAllowedMethods(
+            java.util.List.of(
+                HttpMethod.GET.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.PATCH.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name()
+            )
+        );
+        config.setAllowedHeaders(java.util.List.of("*"));
+        config.setAllowCredentials(true);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
