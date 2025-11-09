@@ -20,7 +20,14 @@ class CmsProxyControllerTest extends BaseIntegrationTest {
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
-                .withBody("[{\"id\":\"1\",\"company\":\"Test Corp\"}]")));
+                .withBody("""
+                    [
+                      {
+                        "id": "1",
+                        "company": "Test Corp"
+                      }
+                    ]
+                    """)));
 
         given()
             .log().all()
@@ -41,7 +48,14 @@ class CmsProxyControllerTest extends BaseIntegrationTest {
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
-                .withBody("[{\"name\":\"Java\",\"rating\":9}]")));
+                .withBody("""
+                    [
+                      {
+                        "name": "Java",
+                        "rating": 9
+                      }
+                    ]
+                    """)));
 
         given()
             .log().all()
@@ -63,7 +77,14 @@ class CmsProxyControllerTest extends BaseIntegrationTest {
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
-                .withBody("[{\"id\":\"1\",\"title\":\"Test Blog\"}]")));
+                .withBody("""
+                    [
+                      {
+                        "id": "1",
+                        "title": "Test Blog"
+                      }
+                    ]
+                    """)));
 
         given()
             .log().all()
@@ -85,7 +106,12 @@ class CmsProxyControllerTest extends BaseIntegrationTest {
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
-                .withBody("{\"id\":\"123\",\"title\":\"Specific Blog\"}")));
+                .withBody("""
+                    {
+                      "id": "123",
+                      "title": "Specific Blog"
+                    }
+                    """)));
 
         given()
             .log().all()

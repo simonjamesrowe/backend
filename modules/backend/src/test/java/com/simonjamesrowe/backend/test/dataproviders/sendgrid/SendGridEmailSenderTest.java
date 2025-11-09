@@ -50,10 +50,29 @@ class SendGridEmailSenderTest {
         Request capturedRequest = requestCaptor.getValue();
         assertThat(capturedRequest.getEndpoint()).isEqualTo("mail/send");
         assertThat(capturedRequest.getMethod()).isEqualTo(Method.POST);
-        String expectedBody =
-            "{\"from\":{\"email\":\"from@from.com\"},\"subject\":\"subject\","
-            + "\"personalizations\":[{\"to\":[{\"email\":\"to@to.com\"}]}],"
-            + "\"content\":[{\"type\":\"text/plain\",\"value\":\"Email body\"}]}";
+        String expectedBody = """
+            {
+              "from": {
+                "email": "from@from.com"
+              },
+              "subject": "subject",
+              "personalizations": [
+                {
+                  "to": [
+                    {
+                      "email": "to@to.com"
+                    }
+                  ]
+                }
+              ],
+              "content": [
+                {
+                  "type": "text/plain",
+                  "value": "Email body"
+                }
+              ]
+            }
+            """;
         JSONAssert.assertEquals(capturedRequest.getBody(), expectedBody, true);
     }
 
