@@ -19,12 +19,12 @@ public class BlogController {
         this.searchBlogsUseCase = searchBlogsUseCase;
     }
 
-    @GetMapping(value = "/blogs", params = "q")
+    @GetMapping(value = {"/blogs", "/search/blogs"}, params = "q")
     public Collection<BlogSearchResult> search(@RequestParam String q) {
         return searchBlogsUseCase.search(q);
     }
 
-    @GetMapping(value = "/blogs", params = {"!q", "!published"})
+    @GetMapping(value = {"/blogs", "/search/blogs"}, params = {"!q", "!published"})
     public Collection<BlogSearchResult> getAll() {
         return searchBlogsUseCase.getAll();
     }

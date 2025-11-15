@@ -3,7 +3,8 @@ package com.simonjamesrowe.backend.test.entrypoints.restcontroller;
 import com.simonjamesrowe.backend.core.model.BlogSearchResult;
 import com.simonjamesrowe.backend.core.usecase.SearchBlogsUseCase;
 import com.simonjamesrowe.backend.entrypoints.restcontroller.BlogController;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,8 +31,9 @@ class BlogControllerTest {
     @MockitoBean
     private SearchBlogsUseCase searchBlogsUseCase;
 
-    @Test
-    void searchShouldReturnExpectedResults() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/blogs", "/search/blogs"})
+    void searchShouldReturnExpectedResults(String path) throws Exception {
         List<BlogSearchResult> searchResults = List.of(
             new BlogSearchResult("1", "Blog 1", "Short desc 1", List.of("tag1"),
                 "thumb1.jpg", "small1.jpg", "med1.jpg", LocalDate.of(2023, 1, 1)),
@@ -43,7 +45,7 @@ class BlogControllerTest {
 
         when(searchBlogsUseCase.search("kotlin")).thenReturn(searchResults);
 
-        mockMvc.perform(get("/blogs")
+        mockMvc.perform(get(path)
                 .param("q", "kotlin")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -56,8 +58,9 @@ class BlogControllerTest {
             .andExpect(jsonPath("$[0].createdDate").value("2023-01-01"));
     }
 
-    @Test
-    void getAllShouldReturnExpectedResults() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/blogs", "/search/blogs"})
+    void getAllShouldReturnExpectedResults(String path) throws Exception {
         List<BlogSearchResult> searchResults = List.of(
             new BlogSearchResult("1", "Blog 1", "Short desc 1", List.of("tag1"),
                 "thumb1.jpg", "small1.jpg", "med1.jpg", LocalDate.of(2023, 1, 1)),
@@ -69,7 +72,7 @@ class BlogControllerTest {
 
         when(searchBlogsUseCase.getAll()).thenReturn(searchResults);
 
-        mockMvc.perform(get("/blogs")
+        mockMvc.perform(get(path)
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))

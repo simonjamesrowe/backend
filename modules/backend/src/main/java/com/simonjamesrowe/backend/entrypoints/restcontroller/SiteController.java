@@ -17,7 +17,7 @@ public class SiteController {
         this.searchSiteUseCase = searchSiteUseCase;
     }
 
-    @GetMapping("/site")
+    @GetMapping({"/site", "/search/site"})
     public List<SiteSearchResult> siteSearch(@RequestParam String q) {
         return searchSiteUseCase.search(q);
     }

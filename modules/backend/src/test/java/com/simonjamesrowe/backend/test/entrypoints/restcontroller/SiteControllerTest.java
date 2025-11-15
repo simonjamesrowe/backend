@@ -3,7 +3,8 @@ package com.simonjamesrowe.backend.test.entrypoints.restcontroller;
 import com.simonjamesrowe.backend.core.model.SiteSearchResult;
 import com.simonjamesrowe.backend.core.usecase.SearchSiteUseCase;
 import com.simonjamesrowe.backend.entrypoints.restcontroller.SiteController;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,8 +30,9 @@ class SiteControllerTest {
     @MockitoBean
     private SearchSiteUseCase searchSiteUseCase;
 
-    @Test
-    void searchResultsShouldBeCorrect() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/site", "/search/site"})
+    void searchResultsShouldBeCorrect(String path) throws Exception {
         List<SiteSearchResult.Hit> hits1 = List.of(
             new SiteSearchResult.Hit("Hit 1", "image1.jpg", "/link1"),
             new SiteSearchResult.Hit("Hit 2", "image2.jpg", "/link2")
@@ -46,7 +48,7 @@ class SiteControllerTest {
 
         when(searchSiteUseCase.search("Universal")).thenReturn(searchResults);
 
-        mockMvc.perform(get("/site")
+        mockMvc.perform(get(path)
                 .param("q", "Universal")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
