@@ -48,7 +48,7 @@ public class CmsResumeRepository implements ResumeRepository {
                                      List<SocialMediaResponseDTO> socialMedias, List<SkillResponseDTO> skills) {
 
         List<ResumeData.Link> links = new ArrayList<>();
-        links.add(new ResumeData.Link("www.simonjamesrowe.com"));
+        links.add(new ResumeData.Link("http://simonrowe.dev"));
         socialMedias.stream()
                 .filter(SocialMediaResponseDTO::includeOnResume)
                 .map(sm -> new ResumeData.Link(sm.link()))
@@ -84,7 +84,7 @@ public class CmsResumeRepository implements ResumeRepository {
         return new ResumeData.Job(
                 response.title(),
                 response.company(),
-                "https://www.simonjamesrowe.com/jobs/" + response.id(),
+                "http://simonrowe.dev/jobs/" + response.id(),
                 response.startDate(),
                 response.endDate(),
                 response.shortDescription(),

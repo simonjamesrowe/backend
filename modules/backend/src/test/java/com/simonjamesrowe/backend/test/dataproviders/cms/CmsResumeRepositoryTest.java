@@ -54,7 +54,7 @@ class CmsResumeRepositoryTest {
         assertThat(result.getJobs().get(0)).hasFieldOrPropertyWithValue("company", "Y-Tree");
         assertThat(result.getJobs().get(0)).hasFieldOrPropertyWithValue(
             "link",
-            "https://www.simonjamesrowe.com/jobs/5eedd4803c8d74001e4497f5"
+            "http://simonrowe.dev/jobs/5eedd4803c8d74001e4497f5"
         );
         assertThat(result.getJobs().get(0)).hasFieldOrPropertyWithValue("start", LocalDate.parse("2020-05-04"));
         assertThat(result.getJobs().get(0)).hasFieldOrPropertyWithValue("location", "London");
